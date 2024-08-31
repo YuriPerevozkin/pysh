@@ -1,5 +1,8 @@
 use std::{
-    env, io::{self, BufRead, Write}, path::Path, process::{Command, Stdio}
+    env,
+    path::Path,
+    io::{self, BufRead, Write},
+    process::{Command, Stdio}
 };
 
 
@@ -15,13 +18,11 @@ fn main() {
             code.push_str(&format!("{input}\n"));
 
             if input.ends_with("\t") {
-                let mut parts = input.split_whitespace();
-                let command = parts.next().unwrap();
-                let args = parts;
+                let mut splited = input.split_whitespace();
 
-                match command {
-                    "cd" => {
-                        let newdir = args.peekable().peek().map_or("/", |x| *x);
+                match splited.next() {
+                    Some("cd") => {
+                        let newdir = splited.peekable().peek().map_or("/", |x| *x);
                         let root = Path::new(newdir);
 
                         if let Err(e) = env::set_current_dir(&root) {
@@ -29,7 +30,7 @@ fn main() {
                         }
 
                         continue 'main;
-                    }
+                    },
                     _ => break
                 }
             }
@@ -44,5 +45,6 @@ fn main() {
         std::thread::spawn(move || {
             stdin.write_all(code.as_bytes()).unwrap()
         });
+        python.wait();
     }
 }
